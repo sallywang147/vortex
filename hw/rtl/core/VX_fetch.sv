@@ -30,8 +30,6 @@ module VX_fetch import VX_gpu_pkg::*; #(
     // outputs
     VX_fetch_if.master      fetch_if
 );
-    `UNUSED_SPARAM (INSTANCE_ID)
-    `UNUSED_VAR (reset)
 
     wire icache_req_valid;
     wire [ICACHE_ADDR_WIDTH-1:0] icache_req_addr;
@@ -58,7 +56,6 @@ module VX_fetch import VX_gpu_pkg::*; #(
         .clk   (clk),
         .read  (1'b1),
         .write (icache_req_fire),
-        `UNUSED_PIN (wren),
         .waddr (req_tag),
         .wdata ({schedule_if.data.PC, schedule_if.data.tmask}),
         .raddr (rsp_tag),
