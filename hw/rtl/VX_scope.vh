@@ -61,7 +61,7 @@
 
 `define SCOPE_IO_UNUSED_W(__i)
 
-`define SCOPE_IO_UNUSED(__i)
+`define SCOPE_IO_UNUSED()
 
 `endif
 
