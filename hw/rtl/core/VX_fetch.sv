@@ -158,7 +158,7 @@ module VX_fetch import VX_gpu_pkg::*; #(
         .bus_out (scope_bus_out)
     );
 `else
-    `SCOPE_IO_UNUSED()
+    `SCOPE_IO_UNUSED(1)
 `endif
 
 `ifdef DBG_TRACE_MEM
