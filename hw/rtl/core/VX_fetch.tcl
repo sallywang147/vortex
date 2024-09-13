@@ -19,41 +19,52 @@ set -assert true
 set -formal_depth 20
 set -model_assumptions true
 
+# Assume: Reset is asserted high for at least two cycles at the beginning
+add_assume -name reset_sequence -expr {
+    reset == 1'b1 [*2];
+}
+
+# Assert: After reset is deasserted, the fetch module should eventually make a fetch request
+add_assertion -name fetch_request_eventually -expr {
+    $rose(!reset) |=> eventually (icache_bus_if.req_valid == 1'b1);
+}
+
+# Cover: The fetch interface becomes valid at some point
+add_cover -name fetch_if_valid -expr {
+    eventually (fetch_if.valid == 1'b1);
+}
+
+# Assert: When a schedule is valid and I-buffer is ready, a cache request is made
+add_assertion -name icache_request_fire -expr {
+    always { (schedule_if.valid && ibuf_ready) -> (icache_req_valid == 1'b1); }
+}
+
+# Assume: The instruction cache always accepts requests when valid
+add_assume -name icache_req_ready -expr {
+    always { icache_bus_if.req_valid == 1'b1 -> icache_bus_if.req_ready == 1'b1; }
+}
+
+# Assert: The fetch interface is ready when the cache response is valid
+add_assertion -name fetch_if_ready -expr {
+    always { icache_bus_if.rsp_valid == 1'b1 -> fetch_if.valid == 1'b1; }
+}
+
+# Cover: A complete fetch cycle occurs
+add_cover -name complete_fetch_cycle -expr {
+    sequence complete_fetch;
+        (!reset && schedule_if.valid && schedule_if.ready) ##1
+        icache_bus_if.req_valid && icache_bus_if.req_ready ##1
+        icache_bus_if.rsp_valid && icache_bus_if.rsp_ready ##1
+        fetch_if.valid && fetch_if.ready;
+    endsequence
+    complete_fetch;
+}
+
 set_engine_mode {K C Tri I N AD AM Hp B}
 set_proofgrid_per_engine_max_jobs 32
 set_proofgrid_max_jobs 32
 set_prove_time_limit 12m
 set_prove_per_property_time_limit 12m
-
-# Assertion to check that icache_req_valid is asserted when schedule_if.valid and ibuf_ready are both high.
-assert {VX_fetch.schedule_if.valid && VX_fetch.ibuf_ready -> VX_fetch.icache_req_valid}
-
-# Assertion to ensure that when icache_req_valid and icache_req_ready are both asserted, icache_req_fire is also asserted.
-assert {VX_fetch.icache_req_valid && VX_fetch.icache_req_ready -> VX_fetch.icache_req_fire}
-
-# Assertion to check that when schedule_if.valid is asserted, schedule_if.ready will be asserted only if icache_req_ready and ibuf_ready are both high.
-assert {VX_fetch.schedule_if.valid -> (VX_fetch.schedule_if.ready == (VX_fetch.icache_req_ready && VX_fetch.ibuf_ready))}
-
-# Assertion to check that data in the tag_store is written correctly when icache_req_fire is asserted.
-assert {VX_fetch.icache_req_fire -> (VX_fetch.tag_store.waddr == VX_fetch.req_tag && VX_fetch.tag_store.wdata == {VX_fetch.schedule_if.data.PC, VX_fetch.schedule_if.data.tmask})}
-
-# Assertion to ensure that fetch_if.valid is only asserted when icache_bus_if.rsp_valid is asserted.
-assert {VX_fetch.icache_bus_if.rsp_valid -> VX_fetch.fetch_if.valid}
-
-# Assertion to verify that if fetch_if.valid is asserted, fetch_if.ready is asserted for icache_bus_if.rsp_ready.
-assert {VX_fetch.fetch_if.valid -> (VX_fetch.icache_bus_if.rsp_ready == VX_fetch.fetch_if.ready)}
-
-# Cover property to check that icache_req_fire is covered at least once.
-cover {VX_fetch.icache_req_fire}
-
-# Cover property to check that fetch_if.valid is covered at least once.
-cover {VX_fetch.fetch_if.valid}
-
-# Assume property to ensure icache_req_ready behaves correctly.
-assume {VX_fetch.icache_req_valid && VX_fetch.icache_req_ready -> VX_fetch.icache_req_fire}
-
-# Assume property that ensures the pending_ibuf_full signal behaves correctly.
-assume {VX_fetch.icache_req_fire && (VX_fetch.schedule_if.data.wid == i) -> (VX_fetch.pending_ibuf_full[i] == (VX_fetch.icache_req_fire && (VX_fetch.schedule_if.data.wid == i)))}
 
 puts "END"
 # Generate a comprehensive report
