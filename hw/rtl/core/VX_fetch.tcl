@@ -2,7 +2,7 @@
 
 # Read in the necessary HDL files
 # Ensure that 'VX_define.vh' is accessible in the include path
-analyze -sv VX_gpu_pkg.sv VX_fetch.sv
+analyze +incdir+../ -sv VX_gpu_pkg.sv VX_fetch.sv
 
 # Define any macros that might not be defined in the included files
 set_define STRING string
@@ -11,9 +11,10 @@ set_define UNUSED_SPARAM(x)
 set_define UNUSED_VAR(x)
 set_define UNUSED_PIN(x)
 set_define RUNTIME_ASSERT(condition, message)
-set_define UNUSED_VAR(x)
 set_define DBG_SCOPE_FETCH
 set_define DBG_TRACE_MEM
+set_define IGNORE_UNUSED_BEGIN
+set_define IGNORE_UNUSED_END
 
 # Define parameter values if they are not set in 'VX_define.vh'
 set_define UUID_WIDTH 32
