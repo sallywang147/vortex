@@ -46,7 +46,7 @@ assert -name fetch_if_ready {
 
 # Cover: A complete fetch cycle occurs
 cover -name complete_fetch_cycle {
-    sequence complete_fetch;
+    sequence complete_fetch
         !reset && schedule_if.valid && schedule_if.ready ##1
         icache_bus_if.req_valid && icache_bus_if.req_ready ##1
         icache_bus_if.rsp_valid && icache_bus_if.rsp_ready ##1
