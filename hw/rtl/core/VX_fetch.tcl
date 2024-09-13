@@ -19,38 +19,33 @@ set -assert true
 set -formal_depth 20
 set -model_assumptions true
 
-# Assume: Reset is asserted high for at least two cycles at the beginning
-add_assume -name reset_sequence -expr {
-    reset == 1'b1 [*2];
-}
-
 # Assert: After reset is deasserted, the fetch module should eventually make a fetch request
-add_assertion -name fetch_request_eventually -expr {
-    $rose(!reset) |=> eventually (icache_bus_if.req_valid == 1'b1);
+assert -name fetch_request_eventually -expr {
+    $rose(!reset) |=> eventually (icache_bus_if.req_valid == 1);
 }
 
 # Cover: The fetch interface becomes valid at some point
-add_cover -name fetch_if_valid -expr {
-    eventually (fetch_if.valid == 1'b1);
+cover -name fetch_if_valid -expr {
+    eventually (fetch_if.valid == 1);
 }
 
 # Assert: When a schedule is valid and I-buffer is ready, a cache request is made
-add_assertion -name icache_request_fire -expr {
-    always { (schedule_if.valid && ibuf_ready) -> (icache_req_valid == 1'b1); }
+assert -name icache_request_fire -expr {
+    always { (schedule_if.valid && ibuf_ready) -> (icache_req_valid == 1); }
 }
 
 # Assume: The instruction cache always accepts requests when valid
-add_assume -name icache_req_ready -expr {
-    always { icache_bus_if.req_valid == 1'b1 -> icache_bus_if.req_ready == 1'b1; }
+assume -name icache_req_ready -expr {
+    always { icache_bus_if.req_valid == 1 -> icache_bus_if.req_ready == 1; }
 }
 
 # Assert: The fetch interface is ready when the cache response is valid
-add_assertion -name fetch_if_ready -expr {
-    always { icache_bus_if.rsp_valid == 1'b1 -> fetch_if.valid == 1'b1; }
+assert -name fetch_if_ready -expr {
+    always { icache_bus_if.rsp_valid == 1 -> fetch_if.valid == 1; }
 }
 
 # Cover: A complete fetch cycle occurs
-add_cover -name complete_fetch_cycle -expr {
+cover -name complete_fetch_cycle -expr {
     sequence complete_fetch;
         (!reset && schedule_if.valid && schedule_if.ready) ##1
         icache_bus_if.req_valid && icache_bus_if.req_ready ##1
@@ -65,6 +60,8 @@ set_proofgrid_per_engine_max_jobs 32
 set_proofgrid_max_jobs 32
 set_prove_time_limit 12m
 set_prove_per_property_time_limit 12m
+
+prove -all
 
 puts "END"
 # Generate a comprehensive report
