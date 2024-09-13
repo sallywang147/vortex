@@ -10,9 +10,6 @@ elaborate -bbox_m VX_dp_ram -bbox_m VX_elastic_buffer -top VX_fetch
 
 clock clk
 reset reset
-# Define the clock signal
-clk -period 10
-
 
 
 # Enable assertion checking
