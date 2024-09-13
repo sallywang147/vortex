@@ -62,7 +62,6 @@
 `define SCOPE_IO_UNUSED_W(__i)
 
 `define SCOPE_IO_UNUSED()
-
 `endif
 
 `endif // VX_SCOPE_VH
