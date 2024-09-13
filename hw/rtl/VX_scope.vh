@@ -41,7 +41,7 @@
     .scope_bus_in (scope_bus_in_w[__i]), \
     .scope_bus_out (scope_bus_out_w[__i]),
 
-`define SCOPE_IO_UNUSED() \
+`define SCOPE_IO_UNUSED(__i) \
     `UNUSED_VAR (scope_reset); \
     `UNUSED_VAR (scope_bus_in); \
     assign scope_bus_out = 0;
@@ -61,7 +61,7 @@
 
 `define SCOPE_IO_UNUSED_W(__i)
 
-`define SCOPE_IO_UNUSED()
+`define SCOPE_IO_UNUSED(__i)
 `endif
 
 `endif // VX_SCOPE_VH
