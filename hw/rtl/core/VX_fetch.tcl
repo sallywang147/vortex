@@ -6,7 +6,7 @@ analyze +incdir+../ -sv VX_gpu_pkg.sv VX_fetch.sv
 
 
 # Set the top-level module for verification
-set -top VX_fetch
+elaborate -top VX_fetch
 
 clock clk
 reset rst

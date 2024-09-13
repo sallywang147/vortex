@@ -12,6 +12,9 @@
 // limitations under the License.
 
 `include "VX_define.vh"
+`include "mem/VX_mem_bus_if.sv"
+`include "interfaces/VX_schedule_if.sv"
+`include "interfaces/VX_fetch_if.sv"
 
 module VX_fetch import VX_gpu_pkg::*; #(
     parameter `STRING INSTANCE_ID = ""
