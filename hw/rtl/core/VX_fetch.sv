@@ -47,7 +47,7 @@ module VX_fetch import VX_gpu_pkg::*; #(
 
     assign {rsp_uuid, rsp_tag} = icache_bus_if.rsp_data.tag;
 
-    wire [`PC_BITS-1:0] rsp_PC;
+    wire [`PC_BITS-1:0] rsp_PC;    //instruction identifying register (IIR)
     wire [`NUM_THREADS-1:0] rsp_tmask;
 
     VX_dp_ram #(
@@ -94,9 +94,10 @@ module VX_fetch import VX_gpu_pkg::*; #(
         ("%t: *** %s invalid PC=0x%0h, wid=%0d, tmask=%b (#%0d)", $time, INSTANCE_ID, {schedule_if.data.PC, 1'b0}, schedule_if.data.wid, schedule_if.data.tmask, schedule_if.data.uuid))
 
     // Icache Request
+    // (ufsm, IIR)
 
     assign icache_req_valid = schedule_if.valid && ibuf_ready;
-    assign icache_req_addr  = schedule_if.data.PC[1 +: ICACHE_ADDR_WIDTH];
+    assign icache_req_addr  = schedule_if.data.PC[1 +: ICACHE_ADDR_WIDTH]; 
     assign icache_req_tag   = {schedule_if.data.uuid, req_tag};
     assign schedule_if.ready = icache_req_ready && ibuf_ready;
 
@@ -121,11 +122,12 @@ module VX_fetch import VX_gpu_pkg::*; #(
     assign icache_bus_if.req_data.data   = '0;
 
     // Icache Response
+    // (ufsm, IIR)
 
     assign fetch_if.valid = icache_bus_if.rsp_valid;
     assign fetch_if.data.tmask = rsp_tmask;
     assign fetch_if.data.wid   = rsp_tag;
-    assign fetch_if.data.PC    = rsp_PC;
+    assign fetch_if.data.PC    = rsp_PC; 
     assign fetch_if.data.instr = icache_bus_if.rsp_data.data;
     assign fetch_if.data.uuid  = rsp_uuid;
     assign icache_bus_if.rsp_ready = fetch_if.ready;
@@ -150,7 +152,7 @@ module VX_fetch import VX_gpu_pkg::*; #(
             icache_req_fire,
             icache_rsp_fire
         }),
-        .probes ({
+        .probes ({ // (ufsm, IIR)
             schedule_if.data.uuid, schedule_if.data.wid, schedule_if.data.tmask, schedule_if.data.PC,
             icache_bus_if.req_data.tag, icache_bus_if.req_data.byteen, icache_bus_if.req_data.addr,
             icache_bus_if.rsp_data.data, icache_bus_if.rsp_data.tag
