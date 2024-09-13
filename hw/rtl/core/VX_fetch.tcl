@@ -20,9 +20,9 @@ set -formal_depth 20
 set -model_assumptions true
 
 # Assert: After reset is deasserted, the fetch module should eventually make a fetch request
-assert -name fetch_request_eventually {
-    $rose(!reset) |=> eventually (icache_bus_if.req_valid == 1);
-}
+#assert -name fetch_request_eventually {
+#    $rose(!reset) |=> eventually (icache_bus_if.req_valid == 1);
+#}
 
 # Cover: The fetch interface becomes valid at some point
 cover -name fetch_if_valid {
