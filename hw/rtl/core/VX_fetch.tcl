@@ -13,8 +13,7 @@ reset reset
 # Define the clock signal
 clk -period 10
 
-# Define reset behavior: assert reset for the first two cycles
-clk reset -active high -cycles 2
+
 
 # Enable assertion checking
 set -assert true
@@ -23,9 +22,16 @@ set -assert true
 set -formal_depth 20
 set -model_assumptions true
 
-# Run the formal verification
-run_verify
+set_engine_mode {K C Tri I N AD AM Hp B}
+set_proofgrid_per_engine_max_jobs 32
+set_proofgrid_max_jobs 32
+set_prove_time_limit 12m
+set_prove_per_property_time_limit 12m
 
+# Run the formal verification
+task -set mytask
+
+puts "END"
 # Generate a comprehensive report
 report -task mytask -csv -results -file "verification_report.csv" -force
 
