@@ -9,7 +9,7 @@ analyze +incdir+../ -sv VX_gpu_pkg.sv VX_fetch.sv
 elaborate -bbox_m VX_dp_ram -bbox_m VX_elastic_buffer -top VX_fetch
 
 clock clk
-reset rst
+reset reset
 # Define the clock signal
 clk -period 10
 
