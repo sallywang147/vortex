@@ -135,7 +135,6 @@ package VX_gpu_pkg;
         wctl_args_t wctl;
     } op_args_t;
 
-`IGNORE_UNUSED_BEGIN
 
     ///////////////////////// LSU memory Parameters ///////////////////////////
 
@@ -305,8 +304,6 @@ package VX_gpu_pkg;
         default: op_to_sfu_type = `SFU_WCTL;
         endcase
     endfunction
-
-`IGNORE_UNUSED_END
 
 endpackage
 
