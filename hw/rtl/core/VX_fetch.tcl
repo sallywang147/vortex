@@ -21,27 +21,27 @@ set -model_assumptions true
 
 # Assert: After reset is deasserted, the fetch module should eventually make a fetch request
 assert -name fetch_request_eventually {
-    $rose(!reset) |-> icache_bus_if.req_valid == 1;
+    $rose(!reset) |-> icache_bus_if.req_valid == 1
 }
 
 # Cover: The fetch interface becomes valid at some point
 cover -name fetch_if_valid {
-    eventually fetch_if.valid == 1;
+    eventually fetch_if.valid == 1
 }
 
 # Assert: When a schedule is valid and I-buffer is ready, a cache request is made
 assert -name icache_request_fire {
-    always { schedule_if.valid && ibuf_ready -> icache_req_valid == 1; }
+    always { schedule_if.valid && ibuf_ready -> icache_req_valid == 1 }
 }
 
 # Assume: The instruction cache always accepts requests when valid
 assume -name icache_req_ready  {
-    always { icache_bus_if.req_valid == 1 -> icache_bus_if.req_ready == 1; }
+    always { icache_bus_if.req_valid == 1 -> icache_bus_if.req_ready == 1 }
 }
 
 # Assert: The fetch interface is ready when the cache response is valid
 assert -name fetch_if_ready {
-    always { icache_bus_if.rsp_valid == 1 -> fetch_if.valid == 1; }
+    always { icache_bus_if.rsp_valid == 1 -> fetch_if.valid == 1 }
 }
 
 # Cover: A complete fetch cycle occurs
@@ -50,9 +50,9 @@ cover -name complete_fetch_cycle {
         !reset && schedule_if.valid && schedule_if.ready ##1
         icache_bus_if.req_valid && icache_bus_if.req_ready ##1
         icache_bus_if.rsp_valid && icache_bus_if.rsp_ready ##1
-        fetch_if.valid && fetch_if.ready;
+        fetch_if.valid && fetch_if.ready
     endsequence
-    complete_fetch;
+    complete_fetch
 }
 
 set_engine_mode {K C Tri I N AD AM Hp B}
