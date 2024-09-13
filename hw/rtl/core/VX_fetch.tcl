@@ -6,26 +6,28 @@ analyze +incdir+../ -sv VX_gpu_pkg.sv VX_fetch.sv
 
 
 # Set the top-level module for verification
-set_top VX_fetch
+elaborate -top VX_fetch
 
+clock clk
+reset rst
 # Define the clock signal
-define_clock clk -period 10
+clk -period 10
 
 # Define reset behavior: assert reset for the first two cycles
-add_reset clk reset -active high -cycles 2
+clk reset -active high -cycles 2
 
 # Enable assertion checking
-set_option -assert true
+set -assert true
 
 # Set formal verification options
-set_option -formal_depth 20
-set_option -model_assumptions true
+set -formal_depth 20
+set -model_assumptions true
 
 # Run the formal verification
 run_verify
 
 # Generate a comprehensive report
-report_results -all -output verification_report.txt
+report -task mytask -csv -results -file "verification_report.csv" -force
 
 # Exit the tool
 exit
