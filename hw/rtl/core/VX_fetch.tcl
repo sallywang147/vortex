@@ -26,7 +26,7 @@ assert -name fetch_request_eventually {
 
 # Cover: The fetch interface becomes valid at some point
 cover -name fetch_if_valid {
-    eventually fetch_if.valid == 1
+     fetch_if.valid == 1
 }
 
 # Assert: When a schedule is valid and I-buffer is ready, a cache request is made
