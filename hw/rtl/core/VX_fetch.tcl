@@ -25,12 +25,10 @@ set_proofgrid_max_jobs 32
 set_prove_time_limit 12m
 set_prove_per_property_time_limit 12m
 
-# Run the formal verification
-task -set mytask
 
 puts "END"
 # Generate a comprehensive report
-report -task mytask -csv -results -file "verification_report.csv" -force
+report -csv -results -file "verification_report.csv" -force
 
 # Exit the tool
 exit
