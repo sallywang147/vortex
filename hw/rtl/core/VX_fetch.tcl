@@ -2,7 +2,7 @@
 
 # Read in the necessary HDL files
 # Ensure that 'VX_define.vh' is accessible in the include path
-analyze +incdir+../ -sv VX_gpu_pkg.sv VX_fetch.sv
+analyze +incdir+../ -sv VX_fetch.sv
 
 # Define any macros that might not be defined in the included files
 set_define STRING string
