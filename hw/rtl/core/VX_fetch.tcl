@@ -1,5 +1,3 @@
-
-
 # Read in the necessary HDL files
 # Ensure that 'VX_define.vh' is accessible in the include path
 analyze +incdir+../ -sv VX_gpu_pkg.sv VX_fetch.sv
@@ -21,7 +19,7 @@ set -model_assumptions true
 
 # Assert: After reset is deasserted, the fetch module should eventually make a fetch request
 assert -name fetch_request_eventually {
-    $rose(!reset) |-> icache_bus_if.req_valid == 1
+    $rose(!reset) |-> eventually icache_bus_if.req_valid == 1
 }
 
 # Cover: The fetch interface becomes valid at some point
@@ -34,26 +32,47 @@ assert -name icache_request_fire {
     always { schedule_if.valid && ibuf_ready -> icache_req_valid == 1 }
 }
 
-# Assume: The instruction cache always accepts requests when valid
-assume -name icache_req_ready  {
-    always { icache_bus_if.req_valid == 1 -> icache_bus_if.req_ready == 1 }
-}
+# Remove the assumption that icache_bus_if.req_ready is always ready
+# to allow exploration of cases where it might not be ready
+#assume -name icache_req_ready  {
+#    always { icache_bus_if.req_valid == 1 -> icache_bus_if.req_ready == 1 }
+#}
 
-# Assert: The fetch interface is ready when the cache response is valid
-assert -name fetch_if_ready {
+# Assert: The fetch interface is valid when the cache response is valid
+assert -name fetch_if_valid_when_rsp_valid {
     always { icache_bus_if.rsp_valid == 1 -> fetch_if.valid == 1 }
 }
 
 # Cover: A complete fetch cycle occurs
-#cover -name complete_fetch_cycle {
-#    sequence complete_fetch
-#        !reset && schedule_if.valid && schedule_if.ready ##1
-#        icache_bus_if.req_valid && icache_bus_if.req_ready ##1
-#        icache_bus_if.rsp_valid && icache_bus_if.rsp_ready ##1
-#        fetch_if.valid && fetch_if.ready
-#    endsequence
-#   complete_fetch
-#}
+cover -name complete_fetch_cycle {
+    sequence complete_fetch;
+        !reset && schedule_if.valid && schedule_if.ready ##1
+        icache_bus_if.req_valid && icache_bus_if.req_ready ##1
+        icache_bus_if.rsp_valid && icache_bus_if.rsp_ready ##1
+        fetch_if.valid && fetch_if.ready
+    endsequence
+    complete_fetch
+}
+
+# Cover: The cache request fires
+cover -name icache_req_fire {
+    icache_req_fire == 1
+}
+
+# Assert: When schedule is valid, PC should not be zero
+assert -name schedule_if_PC_nonzero {
+    always { schedule_if.valid == 1 -> schedule_if.data.PC != 0 }
+}
+
+# Cover: Attempt to cover the case where PC is zero (should trigger assertion)
+cover -name schedule_if_PC_zero {
+    schedule_if.valid == 1 && schedule_if.data.PC == 0
+}
+
+# Assume: Schedule interface becomes valid eventually
+assume -name schedule_if_valid_eventually {
+    $rose(!reset) |-> eventually schedule_if.valid == 1
+}
 
 set_engine_mode {K C Tri I N AD AM Hp B}
 set_proofgrid_per_engine_max_jobs 32
