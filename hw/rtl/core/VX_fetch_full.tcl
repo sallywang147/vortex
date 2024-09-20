@@ -66,7 +66,7 @@ cover -name schedule_if_PC_zero {
 
 # Assume: Schedule interface becomes valid eventually
 assume -name schedule_if_valid_eventually {
-    $rose(!reset) |-> eventually schedule_if.valid == 1
+    $rose(!reset) |-> schedule_if.valid == 1
 }
 
 set_engine_mode {K C Tri I N AD AM Hp B}
