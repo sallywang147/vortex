@@ -181,7 +181,7 @@ module VX_fetch import VX_gpu_pkg::*; #(
 `endif
 
 // Since rsp_tag[1] is always zero, cover rsp_tag[0] values
-`RUNTIME_ASSERT rsp_tag_zero_zero ( rsp_tag == 2'b00);
+`RUNTIME_ASSERT rsp_tag_zero_zero ((rsp_tag == 2'b00, "assertion failure"));
    
 
 /***
