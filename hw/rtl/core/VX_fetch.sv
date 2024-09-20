@@ -181,22 +181,22 @@ module VX_fetch import VX_gpu_pkg::*; #(
 `endif
 
 // Since rsp_tag[1] is always zero, cover rsp_tag[0] values
-cover -name rsp_tag_zero_zero {
-    rsp_tag == 2'b00
-}
+`RUNTIME_ASSERT rsp_tag_zero_zero ( rsp_tag == 2'b00);
+   
 
-cover -name rsp_tag_zero_one {
+/***
+cover rsp_tag_zero_one {
     rsp_tag == 2'b01
 }
 
 // Cover different possible values of icache_req_addr
-cover -name icache_req_addr_zero {
+cover icache_req_addr_zero {
     icache_req_addr == 30'h00000000
 }
 
 cover -name icache_req_addr_max {
     icache_req_addr == 30'h3FFFFFFF 
 }
-
+***/
 
 endmodule
